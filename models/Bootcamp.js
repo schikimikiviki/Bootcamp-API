@@ -1,19 +1,21 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
+const geoCoder = require('../utils/geocoder');
 
-const Bootcampschema = new mongoose.Schema({
+const BootcampSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [false, 'Please provide a name'],
-    unique: false,
-    trim: false,
+    required: [true, 'Please provide a name'],
+    unique: true,
+    trim: true,
     maxlength: [50, 'Name cannot have more than 50 characters'],
   },
 
   slug: String,
   description: {
     type: String,
-    required: [false, 'Please provide a description'],
-    unique: false,
+    required: [true, 'Please provide a description'],
+    unique: true,
     trim: true,
     maxlength: [500, 'Description cannot have more than 500 characters'],
   },
@@ -37,7 +39,7 @@ const Bootcampschema = new mongoose.Schema({
   },
   address: {
     type: String,
-    required: [false, 'Please provide adress'],
+    required: [true, 'Please provide adress'],
   },
   location: {
     type: {
@@ -59,7 +61,7 @@ const Bootcampschema = new mongoose.Schema({
   },
   carreers: {
     type: [String],
-    required: false,
+    required: true,
     enum: [
       'Web Development',
       'Mobile Development',
@@ -101,4 +103,32 @@ const Bootcampschema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Bootcamp', Bootcampschema);
+// create bootcamp slug from name
+
+BootcampSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  console.log('Slugify ran', this.name);
+  next();
+});
+
+// Geocode and create location field
+BootcampSchema.pre('save', async function (next) {
+  const loc = await geoCoder.geocode(this.address);
+  this.location = {
+    type: 'Point',
+    coordinates: [loc[0].longitude, loc[0].latitude],
+    formattedAdress: loc[0].formattedAddress,
+    street: loc[0].streetName,
+    city: loc[0].city,
+    state: loc[0].stateCode,
+    zipcode: loc[0].zipcode,
+    country: loc[0].countryCode,
+  };
+
+  // Do not save adress in DB
+
+  this.adress = undefined;
+  next();
+});
+
+module.exports = mongoose.model('Bootcamp', BootcampSchema);
