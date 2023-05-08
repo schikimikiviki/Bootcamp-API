@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 
 const bootcamps = require('./routes/bootcamps');
+const courses = require('./routes/courses');
 const logger = require(`./middleware/logger.js`);
 const connectDB = require('./config/db.js');
 const colors = require('colors');
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use(logger);
 
 app.use('/api/v1/bootcamps', bootcamps);
+app.use('/api/v1/courses', courses);
 
 app.use(errorHandler);
 
