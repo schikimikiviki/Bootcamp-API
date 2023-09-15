@@ -14,6 +14,8 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
 
+// this is a test
+
 // read JSON files
 
 const bootcamps = JSON.parse(
