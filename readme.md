@@ -2,6 +2,11 @@
 
 > Backend API for the devcamper application which is a bootcamp directory website
 
+## Live Website
+
+Visit https://devcamper-bootcamp.at
+
+The project is deployed on a General Purpose Linux VPS 8/2/50
 
 ## Usage
 
